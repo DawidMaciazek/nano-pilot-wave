@@ -5,6 +5,13 @@ atom_style              bond
 boundary                f f f
 processors              * * 1
 
+# NOTES
+# Resonance condition:
+# m_membrane/ k_mem_force/= 10 (e. g. T=700,m=10,k=1.0}
+
+# v = f*lambda  // wave velocity on the membrane
+# v ~ k/m
+
 # variable pool
 variable		thermo index 500
 variable		timestep index 10
@@ -15,19 +22,20 @@ variable		mass3 index 10.0
 
 variable		mem_k index 2.0
 variable		mem_a index 1.0
-variable		froce_k index 1.0
+variable		force_k index 1.0
 variable		force_a index 20.0
 
-variable		visc index 0.001
+variable		visc index 0.1
+variable		visc_p index 0.1
 variable		gravity index 2.0
 
-variable		period index 1800
-variable		amp  index 0.2
+variable		period index 680
+variable		amp  index 0.02
 
 variable		param_k index 0.001
 
-variable		pair_e index 0.0000001 
-variable		pair_a index 20.5
+variable		pair_e index 0.00000001 
+variable		pair_a index 14.5
 
 variable		r index 101
 variable		r_offset index 10
@@ -38,22 +46,25 @@ variable		dump_file index "pilot_wave.lammpstrj"
 variable		dump_freq index 20
 variable		run_len index 10000
 
+variable		p_file index "positions.txt"
+variable		p_freq index 20
+
 bond_style 		harmonic
 read_data		${data}
 
 # create jumping atoms 
-#create_atoms		2 single 0 0 10 units box
+create_atoms		2 single 0 0 6 units box
 #create_atoms		2 single -20 11 10 units box
 
 # - end -
 
 pair_style		lj/cut 10.0
 pair_coeff      	* * 0 1  1
-pair_coeff      	1 2 ${pair_e} ${pair_a}    10
-pair_coeff      	2 2 ${pair_e} ${pair_a}    10
+pair_coeff      	1 2 ${pair_e} ${pair_a}    20
+#pair_coeff      	2 2 ${pair_e} ${pair_a}    20
 
 bond_coeff		1 ${mem_k} ${mem_a}
-bond_coeff		2 ${froce_k} ${force_a}
+bond_coeff		2 ${force_k} ${force_a}
 
 mass 			1 ${mass1}
 mass 			2 ${mass2}
@@ -77,9 +88,10 @@ region			cyl_out cylinder z 0 0 ${r} -1 1 units box
 region			cyl_in cylinder z 0 0 ${r_in} -1 1 units box
 group			cyl_out region cyl_out
 group			cyl_in region cyl_in
-group			ring subtract cyl_out cyl_in
+#group			ring subtract cyl_out cyl_in
+group			ring union cyl_out cyl_in
 
-fix			ring ring setforce 0.0 0.0 0.0
+fix			ring ring setforce 0.0 0.0 NULL
 
 
 fix                     gravity particles addforce 0.0 0.0 -${gravity}
@@ -89,17 +101,31 @@ fix			wiggle force_layer move wiggle 0.0 0.0 ${amp} ${period} units box
 variable		fx atom -x*(-${r_in}+ln(exp(sqrt(x^2+y^2))+exp(${r_in})))*${param_k}
 variable		fy atom -y*(-${r_in}+ln(exp(sqrt(x^2+y^2))+exp(${r_in})))*${param_k}
 
-fix			pot_well particles addforce v_fx v_fy 0
+#fix			pot_well particles addforce v_fx v_fy 0
 
 fix			vis membrane viscous ${visc}
+fix			vis_p membrane viscous ${visc_p}
 
 
-dump			MyDump all custom ${dump_freq} ${dump_file} element x y z
-dump_modify		MyDump sort id element Xe Pb He
+group			dump_group union membrane particles
 
 compute			mem_com membrane com
 compute			force_com force_layer com
+compute			part_com particles com
 
+variable		mem_com equal c_mem_com[3]
+variable		force_com equal c_force_com[3]+${force_a}
+variable		part_com equal c_part_com[3]
+
+variable		t equal time
+
+
+variable		z_dev atom c_mem_com[3]-z
+
+dump			MyDump dump_group custom ${dump_freq} ${dump_file} element x y z v_z_dev
+dump_modify		MyDump sort id element Xe Pb He
+
+fix			com_print all print ${p_freq} "${t} ${force_com} ${mem_com} ${part_com}" file ${p_file}
 
 
 run 			${run_len}

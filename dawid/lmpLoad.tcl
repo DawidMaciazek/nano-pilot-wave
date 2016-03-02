@@ -9,7 +9,7 @@ proc lmpLoad {args} {
     }
 
     set fileName [lindex $args 0]
-    if {[file exists $fileName] !=} {
+    if {[file exists $fileName] != 1} {
         puts ""
         puts "File $fileName does not exist"
         puts ""
@@ -113,4 +113,4 @@ proc lmpLoad {args} {
 
 # run default for this script
 
-lmpLoad pilot_wave.lammpstrj beta2 4
+lmpLoad pilot_wave.lammpstrj user2 4

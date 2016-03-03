@@ -1,1 +1,2 @@
 mpirun -np 4 lmp_mpi -in in.test  -var period 2728 -var visc_p 0.1 -var mass1 16 -var force_k 0.1 -var mass2 200 -var mem_k 30 -var run_len 20000 -var dudump_freq 50
+mpirun -np 4 lmp_mpi -in in.test  -var period 2728 -var visc_p 0.1 -var mass1 16 -var force_k 0.1 -var mass2 200 -var mem_k 60 -var run_len 20000 -var dudump_freq 50 -v gravity 2.3

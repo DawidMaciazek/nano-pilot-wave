@@ -42,8 +42,8 @@ variable		r_in equal ${r}-${r_offset}
 
 variable		data index "o.dat"
 variable		dump_file index "pilot_wave.lammpstrj"
-variable		dump_freq index 20
-variable		run_len index 10000
+variable		dump_freq index 50
+variable		run_len index 50000
 
 variable		p_file index "positions.txt"
 variable		p_freq index 20
@@ -53,8 +53,8 @@ bond_style 		harmonic
 read_data		${data}
 
 # create jumping atoms 
-create_atoms		2 single 0 0 6 units box
-#create_atoms		2 single -20 11 10 units box
+#create_atoms		2 single 0 0 6 units box
+create_atoms		2 single -20 11 10 units box
 
 # - end -
 

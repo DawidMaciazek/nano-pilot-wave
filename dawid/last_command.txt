@@ -1,2 +1,3 @@
 mpirun -np 4 lmp_mpi -in in.test  -var period 2728 -var visc_p 0.1 -var mass1 16 -var force_k 0.1 -var mass2 200 -var mem_k 30 -var run_len 20000 -var dudump_freq 50
 mpirun -np 4 lmp_mpi -in in.test  -var period 2728 -var visc_p 0.1 -var mass1 16 -var force_k 0.1 -var mass2 200 -var mem_k 60 -var run_len 20000 -var dudump_freq 50 -v gravity 2.3
+mpirun -np 4 lmp_mpi -in in.test  -var period 5465 -var visc 0.2 -var mass1 64 -var force_k 0.1 -var mass2 200 -var mem_k 60 -var run_len 100000 -var dudump_freq 100 -v gravity 2.3 -var dump_file /home/dawid/dumps/tmp/pilot_w.lammpstrj
